@@ -10,6 +10,6 @@ include_directories(${SDL2_INCLUDE_DIR})
 link_directories(${SDL2_LIBRARIES})
 
 set(SOURCE_FILES src/main.cpp)
-add_executable(Target__ src/main.cpp src/Ship.cpp src/Ship.h src/Laser.cpp src/Laser.h src/Target.cpp src/Target.h src/Asteroide.cpp src/Asteroide.h src/Sprite.cpp src/Sprite.h)
+add_executable(Target__ src/main.cpp src/Ship.cpp src/Ship.h src/Laser.cpp src/Laser.h src/Target.cpp src/Target.h src/Asteroide.cpp src/Asteroide.h src/Sprite.cpp src/Sprite.h src/ScoreInfo.cpp src/ScoreInfo.h)
 
-target_link_libraries(${PROJECT_NAME} SDL2main SDL2 SDL2_mixer SDL2_image)
+target_link_libraries(${PROJECT_NAME} SDL2main SDL2 SDL2_mixer SDL2_image SDL2_TTF)

@@ -3,20 +3,23 @@
  * so far, everything is fine !!!
  * (so far...)
  */
-# include <iostream>
 # include <vector>
 # include <algorithm>
 # include <cstdlib>
 # include <ctime>
+# include <string>
+#include <sstream>
 
 # include "SDL.h"
 # include "SDL_mixer.h"
 # include "SDL_image.h"
+# include "SDL_ttf.h"
 
 # include "Ship.h"
 # include "Laser.h"
 # include "Target.h"
 # include "Asteroide.h"
+# include "ScoreInfo.h"
 
 int screenWidth = 1000;
 int screenHeight = 500;
@@ -46,6 +49,7 @@ int main(int argc, char* argv[])
     //-----------start graphic renderer-----------
     SDL_Init(SDL_INIT_VIDEO);  // Initialize SDL2
     IMG_Init(IMG_INIT_PNG); //initialize SDL_image
+    TTF_Init();
     SDL_Window* window = SDL_CreateWindow("Target++", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                               screenWidth, screenHeight, SDL_WINDOW_OPENGL);
     // ----Check that the window was successfully created------
@@ -64,18 +68,17 @@ int main(int argc, char* argv[])
     //----------------------------------------------------//
     SDL_Renderer* render = SDL_CreateRenderer(window, -1, 0);
     // ---------------declaration des images -----------------
-
-    //SDL_Surface* image = SDL_Load("../data/images/background.bmp");
     SDL_Surface* image = IMG_Load("../data/images/background.png");
     SDL_Texture* background = nullptr;
-    if (image != nullptr)
-    {
-        background = SDL_CreateTextureFromSurface(render, image);
-    }
-    else{
+    background = SDL_CreateTextureFromSurface(render, image);
 
-        printf(SDL_GetError()); // a laisser
-    }
+    //---------------LE SCORE------------------------
+    char *scoreText = nullptr;
+    TTF_Font* font = TTF_OpenFont("../data/fonts/m5x7.ttf", 50);
+    SDL_Color white{0,255,0};
+
+    SDL_Surface* scoreSurface;
+    SDL_Texture* scoreTexture;
     // ---------------declaration des musique -------------------------
     Mix_AllocateChannels(10); //aloue cannaux
     Mix_Music *musique = Mix_LoadMUS("../data/music/TargetSong.wav"); //LOAD UNE MUSIQUE
@@ -88,6 +91,7 @@ int main(int argc, char* argv[])
     std::vector<Laser> lasers = {};
     std::vector<Target> targets = {};
     std::vector<Asteroide> cailloux = {};
+    std::vector<ScoreInfo> scoreInfos={};
     //-----------------------------------------------
     Mix_PlayMusic(musique, -1); //JOUE UNE MUSIQUE
     while(programRunning)
@@ -240,7 +244,10 @@ int main(int argc, char* argv[])
         {
             caillou.move();
         }
-
+        for (ScoreInfo& scoreInfo:scoreInfos)
+        {
+            scoreInfo.update();
+        }
         //--------------------Collision générales-----------------
         //moi et les cailloux
         if (!ship.isDamaged && !ship.isBlow)
@@ -276,8 +283,7 @@ int main(int argc, char* argv[])
                     laser.toDestroy = true;
                     target.toDestroy = true;
                     score += target.value;
-                    //ScoreInfo newScoreInfo = new ScoreInfo(target.centerX, target.centerY, target.value, windows);
-                    //scoresInfos.add(newScoreInfo);
+                    scoreInfos.emplace_back(ScoreInfo(render, target.centerX, target.centerY, target.value));
                 }
             }
         }
@@ -314,13 +320,25 @@ int main(int argc, char* argv[])
                         remove_if(targets.begin(), targets.end() - 1, [](Target target) { return target.outScreen; }));
             }
         }
+
         //liste de Cailloux
-        for (Asteroide& caillou : cailloux) {
-            if (caillou.toDestroy) {
+        for (Asteroide& caillou : cailloux)
+        {
+            if (caillou.toDestroy)
+            {
                 cailloux.erase(
                         remove_if(cailloux.begin(), cailloux.end() - 1, [](Asteroide caillou) { return caillou.toDestroy; }));
             }
         }
+
+        //liste des score Info
+        for (ScoreInfo& scoreInfo:scoreInfos)
+        {
+            if (scoreInfo.isEnd){
+                scoreInfos.erase(remove_if(scoreInfos.begin(), scoreInfos.end()-1, [](ScoreInfo scoreInfo){return scoreInfo.isEnd;}));
+            }
+        }
+
         //---------------------------resets-------------------------------------
         //////////////reset tout//////////////
         if (reset) {
@@ -384,6 +402,15 @@ int main(int argc, char* argv[])
             SDL_RenderCopyEx(render, caillou.texture, nullptr, &rect, caillou.angle, nullptr, SDL_FLIP_NONE);
         }
 
+        //---------------------UI----------------------------
+        //Score Infos
+        for (ScoreInfo& scoreInfo:scoreInfos)
+        {
+            rect = {static_cast<int>(scoreInfo.x), static_cast<int>(scoreInfo.y)};
+            SDL_QueryTexture(scoreInfo.texture, nullptr, nullptr, &rect.w, &rect.h);
+            SDL_RenderCopy(render, scoreInfo.texture, nullptr, &rect);
+        }
+
         //la vie
         for (int i=0; i < ship.HP; i++)
         {
@@ -391,6 +418,15 @@ int main(int argc, char* argv[])
             SDL_QueryTexture(ship.lifeTexture, nullptr, nullptr, &rect.w, &rect.h);
             SDL_RenderCopy(render, ship.lifeTexture, nullptr, &rect);
         }
+
+        //le score
+        sprintf(scoreText, "score : %04i", score);
+        scoreSurface = TTF_RenderText_Solid(font, scoreText, white);
+        scoreTexture = SDL_CreateTextureFromSurface(render, scoreSurface);
+        rect = {420, 0};
+        SDL_QueryTexture(scoreTexture, nullptr, nullptr, &rect.w, &rect.h);
+        SDL_RenderCopy(render, scoreTexture, nullptr, &rect);
+        //----------final--------------------
         SDL_RenderPresent(render);
         // ----------// Cap to 60 FPS //-----------------
         SDL_Delay(floor(16.666f));
