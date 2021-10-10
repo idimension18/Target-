@@ -8,12 +8,12 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "C:/Users/MPA/Desktop/Target++/src/Asteroide.cpp" "C:/Users/MPA/Desktop/Target++/cmake-build-debug/CMakeFiles/Target__.dir/src/Asteroide.cpp.obj"
-  "C:/Users/MPA/Desktop/Target++/src/Laser.cpp" "C:/Users/MPA/Desktop/Target++/cmake-build-debug/CMakeFiles/Target__.dir/src/Laser.cpp.obj"
-  "C:/Users/MPA/Desktop/Target++/src/Ship.cpp" "C:/Users/MPA/Desktop/Target++/cmake-build-debug/CMakeFiles/Target__.dir/src/Ship.cpp.obj"
-  "C:/Users/MPA/Desktop/Target++/src/Sprite.cpp" "C:/Users/MPA/Desktop/Target++/cmake-build-debug/CMakeFiles/Target__.dir/src/Sprite.cpp.obj"
-  "C:/Users/MPA/Desktop/Target++/src/Target.cpp" "C:/Users/MPA/Desktop/Target++/cmake-build-debug/CMakeFiles/Target__.dir/src/Target.cpp.obj"
-  "C:/Users/MPA/Desktop/Target++/src/main.cpp" "C:/Users/MPA/Desktop/Target++/cmake-build-debug/CMakeFiles/Target__.dir/src/main.cpp.obj"
+  "C:/Users/idime/OneDrive/Bureau/Target++/src/Asteroide.cpp" "C:/Users/idime/OneDrive/Bureau/Target++/cmake-build-debug/CMakeFiles/Target__.dir/src/Asteroide.cpp.obj"
+  "C:/Users/idime/OneDrive/Bureau/Target++/src/Laser.cpp" "C:/Users/idime/OneDrive/Bureau/Target++/cmake-build-debug/CMakeFiles/Target__.dir/src/Laser.cpp.obj"
+  "C:/Users/idime/OneDrive/Bureau/Target++/src/Ship.cpp" "C:/Users/idime/OneDrive/Bureau/Target++/cmake-build-debug/CMakeFiles/Target__.dir/src/Ship.cpp.obj"
+  "C:/Users/idime/OneDrive/Bureau/Target++/src/Sprite.cpp" "C:/Users/idime/OneDrive/Bureau/Target++/cmake-build-debug/CMakeFiles/Target__.dir/src/Sprite.cpp.obj"
+  "C:/Users/idime/OneDrive/Bureau/Target++/src/Target.cpp" "C:/Users/idime/OneDrive/Bureau/Target++/cmake-build-debug/CMakeFiles/Target__.dir/src/Target.cpp.obj"
+  "C:/Users/idime/OneDrive/Bureau/Target++/src/main.cpp" "C:/Users/idime/OneDrive/Bureau/Target++/cmake-build-debug/CMakeFiles/Target__.dir/src/main.cpp.obj"
   )
 set(CMAKE_CXX_COMPILER_ID "MSVC")
 

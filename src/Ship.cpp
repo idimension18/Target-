@@ -198,7 +198,7 @@ bool Ship::blowUp() {
         x += velocityX/2;
         y += velocityY/2;
         Sprite::centerX = x + (size/2.0);
-        Sprite::centerY = y + (size/2.0f;
+        Sprite::centerY = y + (size/2.0);
         return false;
     } else {
         //windows.getContentPane().remove(blowGIF);

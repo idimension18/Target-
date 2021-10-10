@@ -185,10 +185,10 @@ int main(int argc, char* argv[])
         //----------------------------lasers-------------
         if (createLaser)
         {
-            if (laserTimer >= laserRelease /*&& ship.energie > 0*/)
+            if (laserTimer >= laserRelease && ship.energie > 0)
             {
                 laserTimer = 0;
-                //ship.energie -= 1;
+                ship.energie -= 1;
                 lasers.emplace_back(Laser(render,
                                           ship.x + (ship.size / 2.0) - (50 / 2.0),
                                           ship.y + (ship.size / 2.0) - (13 / 2.0),
