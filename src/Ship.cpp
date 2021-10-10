@@ -56,13 +56,22 @@ sparkGif{}, blowGif{}, currentGifFrame{}
     lifeTexture = SDL_CreateTextureFromSurface(render, lifeImg);
 
     //gif test
-    const fs::path path{"../data/images/sparkGif"};
+    fs::path path{"../data/images/sparkGif"};
     for (const auto& entry : fs::directory_iterator(path))
     {
         tempGif = IMG_Load(entry.path().string().c_str());
         sparkGif.emplace_back(SDL_CreateTextureFromSurface(render, tempGif));
         printf(SDL_GetError());
     }
+
+    path = fs::path{"../data/images/blowGif"};
+    for (const auto& entry : fs::directory_iterator(path))
+    {
+        tempGif = IMG_Load(entry.path().string().c_str());
+        blowGif.emplace_back(SDL_CreateTextureFromSurface(render, tempGif));
+        printf(SDL_GetError());
+    }
+
     blankGif = SDL_CreateTextureFromSurface(render, IMGblankGif);
     currentGifFrame = blankGif;
     //--------------------------------------------
@@ -138,12 +147,12 @@ void Ship::collide() {
     }
 }
 
-void Ship::playGif(std::vector<SDL_Texture*> gifVector)
+void Ship::playGif(std::vector<SDL_Texture*> gifVector, int delay)
 {
     for(SDL_Texture* texture:gifVector)
     {
         currentGifFrame = texture;
-        std::this_thread::sleep_for(std::chrono::milliseconds(40));
+        std::this_thread::sleep_for(std::chrono::milliseconds(delay * 10));
     }
     currentGifFrame = blankGif;
 }
@@ -155,7 +164,7 @@ void Ship::damaged() {
         sparkTimer += 1;
 
         if (sparkTimer == 1) {
-            std::thread th1(&Ship::playGif, this,sparkGif);
+            std::thread th1(&Ship::playGif, this,sparkGif, 4);
             th1.detach();
         } else if (sparkTimer > sparkTime) {
             canRecharge = true;
@@ -191,9 +200,9 @@ bool Ship::blowUp() {
     if (blowTimer < blowTime) {
         isVisible = false;
         blowTimer += 1;
-        //blowGIF.setBounds((int) (x-(350)/2)+(width/2), (int) (y-(350)/2)+(height/2), 350, 350); // for example, you can use your own values
         if (blowTimer == 1) {
-            //windows.getContentPane().add(blowGIF);
+            std::thread th1(&Ship::playGif, this, blowGif, 10);
+            th1.detach();
         }
         x += velocityX/2;
         y += velocityY/2;

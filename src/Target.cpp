@@ -22,13 +22,13 @@ scaledImg{SDL_CreateRGBSurface(0,diameter, diameter, 32, 0x000000FF, 0x0000FF00,
     SDL_GetRendererOutputSize(render, &screenWidth, &screenHeight);
     if (colorID <= 3)
     {
-        tempImg = SDL_LoadBMP("../data/images/redTarget.png");
+        tempImg = IMG_Load("../data/images/redTarget.png");
     } else if (colorID > 3 && colorID <= 6)
     {
-        tempImg = SDL_LoadBMP("../data/images/greenTarget.png");
+        tempImg = IMG_Load("../data/images/greenTarget.png");
     } else
     {
-        tempImg = SDL_LoadBMP("../data/images/yellowTarget.png");
+        tempImg = IMG_Load("../data/images/yellowTarget.png");
     }
     SDL_Rect scaleRect= {0, 0, diameter, diameter};
     SDL_BlitScaled(tempImg, nullptr, scaledImg, &scaleRect);

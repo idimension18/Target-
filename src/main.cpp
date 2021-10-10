@@ -82,6 +82,7 @@ int main(int argc, char* argv[])
     Mix_Chunk *laserSong = Mix_LoadWAV("../data/music/lazer.wav");  //LOAD UN SON
     Mix_Chunk *targetSong = Mix_LoadWAV("../data/music/break.wav");
     Mix_Chunk *spark = Mix_LoadWAV("../data/music/spark.wav");
+    Mix_Chunk *blow = Mix_LoadWAV("../data/music/blow.wav");
     //------------------Déclaration des object-----------------
     Ship ship(render);
     std::vector<Laser> lasers = {};
@@ -185,7 +186,7 @@ int main(int argc, char* argv[])
         //----------------------------lasers-------------
         if (createLaser)
         {
-            if (laserTimer >= laserRelease && ship.energie > 0)
+            if (laserTimer >= laserRelease /*&& ship.energie > 0*/)
             {
                 laserTimer = 0;
                 ship.energie -= 1;
@@ -258,8 +259,8 @@ int main(int argc, char* argv[])
                     {
                         ship.isBlow = true;
                         createLaser = false;
-                        //melee.stop();
-                        //ship.blow.play();
+                        Mix_HaltMusic();
+                        Mix_PlayChannel(-1, blow, 0);
                     }
                     break;
                 }
@@ -320,8 +321,17 @@ int main(int argc, char* argv[])
                         remove_if(cailloux.begin(), cailloux.end() - 1, [](Asteroide caillou) { return caillou.toDestroy; }));
             }
         }
-        //--------------------------------------------------------------------
-
+        //---------------------------resets-------------------------------------
+        //////////////reset tout//////////////
+        if (reset) {
+            reset = false;
+            score = 0;
+            ship = Ship{render};
+            std::vector<Laser> lasers = {};
+            std::vector<Target> targets = {};
+            std::vector<Asteroide> cailloux = {};
+            Mix_PlayMusic(musique, -1);
+        }
         // ------drawing test----------
         //background
         rect = {}; //reset
@@ -329,17 +339,20 @@ int main(int argc, char* argv[])
         SDL_RenderCopy(render, background, nullptr, &rect);
 
         //---------------player----------------
-        //ship
-        rect = {static_cast<int>(ship.x), static_cast<int>(ship.y)}; //reset
-        SDL_QueryTexture(ship.body, nullptr, nullptr, &rect.w, &rect.h);
-        SDL_RenderCopyEx(render, ship.body, nullptr, &rect, ship.angle, nullptr, SDL_FLIP_NONE);
-
-        //fire
-        if (ship.fireOn)
+        if (ship.isVisible)
         {
+            //ship
             rect = {static_cast<int>(ship.x), static_cast<int>(ship.y)}; //reset
-            SDL_QueryTexture(ship.fire, nullptr, nullptr, &rect.w, &rect.h);
-            SDL_RenderCopyEx(render, ship.fire, nullptr, &rect, ship.angle, nullptr, SDL_FLIP_NONE);
+            SDL_QueryTexture(ship.body, nullptr, nullptr, &rect.w, &rect.h);
+            SDL_RenderCopyEx(render, ship.body, nullptr, &rect, ship.angle, nullptr, SDL_FLIP_NONE);
+
+            //fire
+            if (ship.fireOn)
+            {
+                rect = {static_cast<int>(ship.x), static_cast<int>(ship.y)}; //reset
+                SDL_QueryTexture(ship.fire, nullptr, nullptr, &rect.w, &rect.h);
+                SDL_RenderCopyEx(render, ship.fire, nullptr, &rect, ship.angle, nullptr, SDL_FLIP_NONE);
+            }
         }
         //----------------animations-------------------
         rect = {static_cast<int>(ship.x), static_cast<int>(ship.y)}; //reset

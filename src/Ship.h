@@ -29,7 +29,7 @@ public:
     bool blowUp(); //return true when end
     void battery();
 
-    void playGif(std::vector<SDL_Texture*> gifVector);
+    void playGif(std::vector<SDL_Texture*> gifVector, int delay);
 
 private:
     SDL_Texture *blankGif;
