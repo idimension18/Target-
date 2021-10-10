@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
     //------------declaration primaire-------------
     bool programRunning = true, createLaser = false, readyLaser = true, reset=false;
     SDL_Event evt;
-    SDL_Rect rect;
+    SDL_Rect rect, rect2;
                                                                     // a diviser par 60//
     int laserRelease = 5, laserTimer = laserRelease, debriTimer = 0, debriFrequence = 30, targetSize, score = 0;
 
@@ -355,8 +355,9 @@ int main(int argc, char* argv[])
             }
         }
         //----------------animations-------------------
-        rect = {static_cast<int>(ship.x), static_cast<int>(ship.y)}; //reset
-        SDL_QueryTexture(ship.currentGifFrame, nullptr, nullptr, &rect.w, &rect.h);
+        rect2 = {};
+        SDL_QueryTexture(ship.currentGifFrame, nullptr, nullptr, &rect2.w, &rect2.h);
+        rect = {static_cast<int>((ship.x+(ship.size)/2.)-(rect2.w)/2.), static_cast<int>((ship.y+(ship.size)/2.)-(rect2.h)/2.), rect2.w, rect2.h}; //reset
         SDL_RenderCopyEx(render, ship.currentGifFrame, nullptr, &rect, ship.angle, nullptr, SDL_FLIP_NONE);
         //--------------------------------
         //lasers
