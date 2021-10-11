@@ -22,7 +22,7 @@ jetPower{0.1f}, velocityX{0}, velocityY{0}, speedMax{5.0f},
 angle{90}, rotationSpeed{5}, fireOn{false}, rotationDirection{NULL},
 HP{5}, isVisible{true}, isDamaged{false}, isBlow{false}, isStunt{false}, damagedTime{120}, damagedTimer{0},
 blinkTime{10}, blinkTimer{0}, blowTime{150}, blowTimer{0}, sparkTime{60}, sparkTimer{0},
-maxEnergie{30}, energie{maxEnergie}, canRecharge{true}, chargeTime{5}, chargeTimer{0},
+maxEnergie{30}, canRecharge{true}, chargeTime{5}, chargeTimer{0},
 //------------------------------
 //---------declaration graphics----------
 sheet{IMG_Load("../data/images/sprites.png")},
@@ -78,6 +78,7 @@ sparkGif{}, blowGif{}, currentGifFrame{}
     Sprite::centerX = x + (size/2.0);
     Sprite::centerY = y + (size/2.0);
     Sprite::rayon = size/2.0;
+    energie = maxEnergie;
 }
 //-----------go engine----------------
 void Ship::go()

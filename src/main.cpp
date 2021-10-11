@@ -73,12 +73,12 @@ int main(int argc, char* argv[])
     background = SDL_CreateTextureFromSurface(render, image);
 
     //---------------LE SCORE------------------------
-    char *scoreText = nullptr;
+    char *scoreText{const_cast<char *>(std::string("o").c_str())};
     TTF_Font* font = TTF_OpenFont("../data/fonts/m5x7.ttf", 50);
     SDL_Color white{0,255,0};
 
-    SDL_Surface* scoreSurface;
-    SDL_Texture* scoreTexture;
+    SDL_Surface *scoreSurface, *energySurface = TTF_RenderText_Solid(font, "Energy :", white);;
+    SDL_Texture *scoreTexture, *energyTexture = SDL_CreateTextureFromSurface(render, energySurface);
     // ---------------declaration des musique -------------------------
     Mix_AllocateChannels(10); //aloue cannaux
     Mix_Music *musique = Mix_LoadMUS("../data/music/TargetSong.wav"); //LOAD UNE MUSIQUE
@@ -133,6 +133,7 @@ int main(int argc, char* argv[])
                     {
                         createLaser = true;
                         readyLaser = false;
+                        ship.canRecharge = false;
                     }
                 }
                 //--------------------
@@ -167,6 +168,7 @@ int main(int argc, char* argv[])
                 {
                     createLaser = false;
                     readyLaser = true;
+                    ship.canRecharge = true;
                 }
             }
             //-----------------------------------------
@@ -187,10 +189,20 @@ int main(int argc, char* argv[])
         } else {
             reset = ship.blowUp();
         }
-        //----------------------------lasers-------------
+        //---------------reset tout------------------
+        if (reset) {
+            reset = false;
+            score = 0;
+            ship = Ship{render};
+            lasers.clear();
+            targets.clear();
+            cailloux.clear();
+            Mix_PlayMusic(musique, -1);
+        }
+        //----------------------------lasers-------------------
         if (createLaser)
         {
-            if (laserTimer >= laserRelease /*&& ship.energie > 0*/)
+            if (laserTimer >= laserRelease && ship.energie > 0)
             {
                 laserTimer = 0;
                 ship.energie -= 1;
@@ -338,18 +350,6 @@ int main(int argc, char* argv[])
                 scoreInfos.erase(remove_if(scoreInfos.begin(), scoreInfos.end()-1, [](ScoreInfo scoreInfo){return scoreInfo.isEnd;}));
             }
         }
-
-        //---------------------------resets-------------------------------------
-        //////////////reset tout//////////////
-        if (reset) {
-            reset = false;
-            score = 0;
-            ship = Ship{render};
-            std::vector<Laser> lasers = {};
-            std::vector<Target> targets = {};
-            std::vector<Asteroide> cailloux = {};
-            Mix_PlayMusic(musique, -1);
-        }
         // ------drawing test----------
         //background
         rect = {}; //reset
@@ -410,6 +410,17 @@ int main(int argc, char* argv[])
             SDL_QueryTexture(scoreInfo.texture, nullptr, nullptr, &rect.w, &rect.h);
             SDL_RenderCopy(render, scoreInfo.texture, nullptr, &rect);
         }
+
+        //energie bar
+        rect = {850, 0, 50, 20};
+        SDL_RenderCopy(render, energyTexture, nullptr, &rect);
+
+        rect = {850, 20, 75, 25};
+        SDL_SetRenderDrawColor(render, 255, 255, 255, 0);
+        SDL_RenderDrawRect(render, &rect);
+        SDL_SetRenderDrawColor(render, 0, 255, 0, 0);
+        rect = {851, 21, static_cast<int>(74.0*(ship.energie*(1.)/ship.maxEnergie)), 24};
+        SDL_RenderFillRect(render, &rect);
 
         //la vie
         for (int i=0; i < ship.HP; i++)
