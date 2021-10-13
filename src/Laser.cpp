@@ -17,7 +17,6 @@ toDestroy{false},
 laserImg{IMG_Load("../data/images/laser.png")}
 {
     //------affectation graphic----------
-    SDL_GetRendererOutputSize(render, &screenWidth, &screenHeight);
     texture = SDL_CreateTextureFromSurface(render, laserImg);
     //---------Affectation ussuelle----------
     Sprite::rayon = 0;

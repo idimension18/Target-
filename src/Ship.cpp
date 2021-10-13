@@ -35,7 +35,6 @@ lifeImg{SDL_CreateRGBSurface(0,45, 45, 32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0
 sparkGif{}, blowGif{}, currentGifFrame{}
 {
     //---------affectation graphics----------
-    SDL_GetRendererOutputSize(render, &screenWidth, &screenHeight);
     //body
     SDL_Rect cutRect = {2048, 0, 256, 256};
     SDL_BlitSurface(sheet, &cutRect, tempImg, nullptr);
@@ -127,7 +126,8 @@ void Ship::tourne()
 }
 
 //---------------colision-----------
-void Ship::collide() {
+void Ship::collide()
+{
     if (x > screenWidth - size || x < 0) {
         velocityX = 0;
         if (x < 0) {

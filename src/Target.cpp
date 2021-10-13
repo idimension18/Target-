@@ -19,7 +19,6 @@ tempImg{SDL_CreateRGBSurface(0,570, 599, 32, 0x000000FF, 0x0000FF00, 0x00FF0000,
 scaledImg{SDL_CreateRGBSurface(0,diameter, diameter, 32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000)}
 {
     //-----------Afectation graphiques------------------------
-    SDL_GetRendererOutputSize(render, &screenWidth, &screenHeight);
     if (colorID <= 3)
     {
         tempImg = IMG_Load("../data/images/redTarget.png");

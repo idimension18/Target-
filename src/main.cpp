@@ -8,7 +8,7 @@
 # include <cstdlib>
 # include <ctime>
 # include <string>
-#include <sstream>
+# include <sstream>
 
 # include "SDL.h"
 # include "SDL_mixer.h"
@@ -23,7 +23,8 @@
 
 int screenWidth = 1000;
 int screenHeight = 500;
-
+double scaleX = 1;
+double scaleY = 1;
 int mainSpeed = 3;
 
 /*
@@ -34,6 +35,14 @@ int mainSpeed = 3;
 bool circularColision(Sprite obj1, Sprite obj2)
 {
     return sqrt(pow(abs(obj1.centerX - obj2.centerX),2) + pow(abs(obj1.centerY - obj2.centerY),2)) < obj1.rayon + obj2.rayon;
+}
+
+void scaleRect(SDL_Rect *rect)
+{
+    rect->x *= scaleX;
+    rect->y *= scaleY;
+    rect->w *= scaleX;
+    rect->h *= scaleY;
 }
 
 int main(int argc, char* argv[])
@@ -51,7 +60,7 @@ int main(int argc, char* argv[])
     IMG_Init(IMG_INIT_PNG); //initialize SDL_image
     TTF_Init();
     SDL_Window* window = SDL_CreateWindow("Target++", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                              screenWidth, screenHeight, SDL_WINDOW_OPENGL);
+                              screenWidth, screenHeight, SDL_WINDOW_RESIZABLE);
     // ----Check that the window was successfully created------
     if (window == nullptr) {
         // In the case that the window could not be made...
@@ -103,6 +112,17 @@ int main(int argc, char* argv[])
             if (evt.type == SDL_QUIT)
             {
                 programRunning = false;
+            }
+            //-------------evenemtn windows---------
+            if (evt.type == SDL_WINDOWEVENT)
+            {
+                if (evt.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
+                {
+                    rect = {} ;//rest
+                    SDL_GetWindowSize(window, &rect.w, &rect.h);
+                    scaleX = rect.w*1./screenWidth;
+                    scaleY = rect.h*1./screenHeight;
+                }
             }
             //--------------evenement clavier----------
             //--------------key pressed---------
@@ -350,10 +370,11 @@ int main(int argc, char* argv[])
                 scoreInfos.erase(remove_if(scoreInfos.begin(), scoreInfos.end()-1, [](ScoreInfo scoreInfo){return scoreInfo.isEnd;}));
             }
         }
-        // ------drawing test----------
+        // -------------------------drawing stufs----------------
         //background
         rect = {}; //reset
         SDL_QueryTexture(background, nullptr, nullptr, &rect.w, &rect.h);
+        scaleRect(&rect);
         SDL_RenderCopy(render, background, nullptr, &rect);
 
         //---------------player----------------
@@ -362,6 +383,7 @@ int main(int argc, char* argv[])
             //ship
             rect = {static_cast<int>(ship.x), static_cast<int>(ship.y)}; //reset
             SDL_QueryTexture(ship.body, nullptr, nullptr, &rect.w, &rect.h);
+            scaleRect(&rect);
             SDL_RenderCopyEx(render, ship.body, nullptr, &rect, ship.angle, nullptr, SDL_FLIP_NONE);
 
             //fire
@@ -369,13 +391,16 @@ int main(int argc, char* argv[])
             {
                 rect = {static_cast<int>(ship.x), static_cast<int>(ship.y)}; //reset
                 SDL_QueryTexture(ship.fire, nullptr, nullptr, &rect.w, &rect.h);
+                scaleRect(&rect);
                 SDL_RenderCopyEx(render, ship.fire, nullptr, &rect, ship.angle, nullptr, SDL_FLIP_NONE);
             }
         }
         //----------------animations-------------------
         rect2 = {};
         SDL_QueryTexture(ship.currentGifFrame, nullptr, nullptr, &rect2.w, &rect2.h);
+        scaleRect(&rect);
         rect = {static_cast<int>((ship.x+(ship.size)/2.)-(rect2.w)/2.), static_cast<int>((ship.y+(ship.size)/2.)-(rect2.h)/2.), rect2.w, rect2.h}; //reset
+        scaleRect(&rect);
         SDL_RenderCopyEx(render, ship.currentGifFrame, nullptr, &rect, ship.angle, nullptr, SDL_FLIP_NONE);
         //--------------------------------
         //lasers
@@ -383,6 +408,7 @@ int main(int argc, char* argv[])
         {
             rect = {static_cast<int>(laser.x), static_cast<int>(laser.y)};
             SDL_QueryTexture(laser.texture, nullptr, nullptr, &rect.w, &rect.h);
+            scaleRect(&rect);
             SDL_RenderCopyEx(render, laser.texture, nullptr, &rect, laser.angle, nullptr, SDL_FLIP_NONE);
         }
 
@@ -391,6 +417,7 @@ int main(int argc, char* argv[])
         {
             rect = {static_cast<int>(target.x), static_cast<int>(target.y)}; //reset
             SDL_QueryTexture(target.texture, nullptr, nullptr, &rect.w, &rect.h);
+            scaleRect(&rect);
             SDL_RenderCopy(render, target.texture, nullptr, &rect);
         }
 
@@ -399,27 +426,33 @@ int main(int argc, char* argv[])
         {
             rect = {static_cast<int>(caillou.x), static_cast<int>(caillou.y)};
             SDL_QueryTexture(caillou.texture, nullptr, nullptr, &rect.w, &rect.h);
+            scaleRect(&rect);
             SDL_RenderCopyEx(render, caillou.texture, nullptr, &rect, caillou.angle, nullptr, SDL_FLIP_NONE);
         }
 
-        //---------------------UI----------------------------
+        //------------------------user interface----------------------------
         //Score Infos
         for (ScoreInfo& scoreInfo:scoreInfos)
         {
             rect = {static_cast<int>(scoreInfo.x), static_cast<int>(scoreInfo.y)};
             SDL_QueryTexture(scoreInfo.texture, nullptr, nullptr, &rect.w, &rect.h);
+            scaleRect(&rect);
             SDL_RenderCopy(render, scoreInfo.texture, nullptr, &rect);
         }
 
         //energie bar
         rect = {850, 0, 50, 20};
+        scaleRect(&rect);
         SDL_RenderCopy(render, energyTexture, nullptr, &rect);
 
         rect = {850, 20, 75, 25};
+        scaleRect(&rect);
         SDL_SetRenderDrawColor(render, 255, 255, 255, 0);
         SDL_RenderDrawRect(render, &rect);
+
         SDL_SetRenderDrawColor(render, 0, 255, 0, 0);
         rect = {851, 21, static_cast<int>(74.0*(ship.energie*(1.)/ship.maxEnergie)), 24};
+        scaleRect(&rect);
         SDL_RenderFillRect(render, &rect);
 
         //la vie
@@ -427,6 +460,7 @@ int main(int argc, char* argv[])
         {
             rect = {static_cast<int>(i*45), static_cast<int>(0)};
             SDL_QueryTexture(ship.lifeTexture, nullptr, nullptr, &rect.w, &rect.h);
+            scaleRect(&rect);
             SDL_RenderCopy(render, ship.lifeTexture, nullptr, &rect);
         }
 
@@ -434,14 +468,17 @@ int main(int argc, char* argv[])
         sprintf(scoreText, "score : %04i", score);
         scoreSurface = TTF_RenderText_Solid(font, scoreText, white);
         scoreTexture = SDL_CreateTextureFromSurface(render, scoreSurface);
+
         rect = {420, 0};
         SDL_QueryTexture(scoreTexture, nullptr, nullptr, &rect.w, &rect.h);
+        scaleRect(&rect);
         SDL_RenderCopy(render, scoreTexture, nullptr, &rect);
-        //----------final--------------------
+        //----------------final--------------------
         SDL_RenderPresent(render);
         // ----------// Cap to 60 FPS //-----------------
         SDL_Delay(floor(16.666f));
     }
+
     // Clean up
     SDL_DestroyRenderer(render);
     SDL_FreeSurface(image);
