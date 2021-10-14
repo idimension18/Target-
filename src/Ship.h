@@ -23,7 +23,7 @@ public:
 
     void go(); //calcule velocity
     void velocity(); // ad velocity
-    void tourne(); //tourne
+    void tourne(double newAngle); //tourne
     void collide(); //make collide
     void damaged(); //damaged
     bool blowUp(); //return true when end

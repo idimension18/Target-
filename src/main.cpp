@@ -23,9 +23,13 @@
 
 int screenWidth = 1000;
 int screenHeight = 500;
+
 double scaleX = 1;
 double scaleY = 1;
+
 int mainSpeed = 3;
+
+double maxAxis = 32768.;
 
 /*
  * a function to calculate circular collision
@@ -54,9 +58,24 @@ int main(int argc, char* argv[])
     SDL_Rect rect, rect2;
                                                                     // a diviser par 60//
     int laserRelease = 5, laserTimer = laserRelease, debriTimer = 0, debriFrequence = 30, targetSize, score = 0;
+    double axisX = 0, axisY = 0, axisRatio = 0, axisAngle = 0;
 
     //-----------start graphic renderer-----------
-    SDL_Init(SDL_INIT_VIDEO);  // Initialize SDL2
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);  // Initialize SDL2
+    //------------------------------------------------------------
+    SDL_Joystick* pJoystick = NULL;
+    int numJoystick = SDL_NumJoysticks(); // Compte le nombre de joysticks
+    printf("Vous avez %d joysticks sur cette machine\n",numJoystick);
+    if ( numJoystick >= 1 )
+    {
+        // Ouvre le premier joystick présent sur la machine
+        pJoystick = SDL_JoystickOpen(0);
+        if ( pJoystick == NULL )
+        {
+            fprintf(stderr,"Erreur pour ouvrir le premier joystick\n");
+        }
+    }
+    //--------------------------------------------------------------------------
     IMG_Init(IMG_INIT_PNG); //initialize SDL_image
     TTF_Init();
     SDL_Window* window = SDL_CreateWindow("Target++", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -67,6 +86,12 @@ int main(int argc, char* argv[])
         printf("Could not create window: %s\n", SDL_GetError());
         return 1;
     }
+    printf("Informations du joystick\n");
+    printf("Nom : %s\n",SDL_JoystickName(0));
+    printf("Nombre d'axes : %d\n",SDL_JoystickNumAxes(pJoystick));
+    printf("Nombre de chapeaux : %d\n",SDL_JoystickNumHats(pJoystick));
+    printf("Nombre de trackballs : %d\n",SDL_JoystickNumBalls(pJoystick));
+    printf("Nombre de boutons : %d\n",SDL_JoystickNumButtons(pJoystick));
     //--------------------------------------------------------//
 
     // --------------SDL_mixer --------------------------
@@ -124,74 +149,70 @@ int main(int argc, char* argv[])
                     scaleY = rect.h*1./screenHeight;
                 }
             }
-            //--------------evenement clavier----------
-            //--------------key pressed---------
-            if (evt.type == SDL_KEYDOWN)
-            {
-                //go
-                if (evt.key.keysym.sym == SDLK_z)
-                {
-                    ship.fireOn = true;
-                }
-
-                //tourne +
-                if (evt.key.keysym.sym == SDLK_q)
-                {
-                    ship.rotationDirection = '+';
-                }
-
-                //tourne -
-                if (evt.key.keysym.sym == SDLK_d)
-                {
-                    ship.rotationDirection = '-';
-                }
-
-                //shoot laser
-                if (evt.key.keysym.sym == SDLK_TAB)
-                {
-                    if (readyLaser)
-                    {
-                        createLaser = true;
-                        readyLaser = false;
-                        ship.canRecharge = false;
-                    }
-                }
-                //--------------------
-
-            }
-            if (evt.type == SDL_KEYUP){
-                if (evt.key.keysym.sym == SDLK_z)
-                {
-                    ship.fireOn = false;
-                }
-
-                //-------stop rotation---------
-                if (evt.key.keysym.sym == SDLK_q)
-                {
-                    if (ship.rotationDirection == '+')
-                    {
-                        ship.rotationDirection = NULL;
-                    }
-                }
-
-                if (evt.key.keysym.sym == SDLK_d)
-                {
-                    if (ship.rotationDirection == '-')
-                    {
-                        ship.rotationDirection = NULL;
-                    }
-                }
-                //-----------------------
-
-                //get laser ready
-                if (evt.key.keysym.sym == SDLK_TAB)
-                {
-                    createLaser = false;
-                    readyLaser = true;
-                    ship.canRecharge = true;
-                }
-            }
             //-----------------------------------------
+            if ( evt.type == SDL_JOYBUTTONDOWN || evt.type == SDL_JOYBUTTONUP)
+            {
+                //------------------pressed------------------
+                if (evt.jbutton.state == SDL_PRESSED)
+                {
+                    //lasers
+                    if (evt.jbutton.button == 0)
+                    {
+                        if (readyLaser)
+                        {
+                            createLaser = true;
+                            readyLaser = false;
+                            ship.canRecharge = false;
+                        }
+                    }
+                }
+                //-------------------release-----------------
+                if (evt.jbutton.state == SDL_RELEASED)
+                {
+                    //lasers
+                    if (evt.jbutton.button == 0)
+                    {
+                        createLaser = false;
+                        readyLaser = true;
+                        ship.canRecharge = true;
+                    }
+                }
+            }
+            //-------------------- evenement stick---------------------------
+            if (evt.type == SDL_JOYAXISMOTION)
+            {
+                //-------------- fire ------------------
+                if (evt.jaxis.axis == 5)
+                {
+                    if (evt.jaxis.value > 0) //fire on
+                    {
+                        ship.fireOn = true;
+                    } else //fire off
+                    {
+                        ship.fireOn = false;
+                    }
+                }
+                //---------------Direction  stick ------------------
+                if (evt.jaxis.axis == 0) // x axis
+                {
+                    axisX = round(evt.jaxis.value/maxAxis *1000)/1000;
+                }
+                if (evt.jaxis.axis == 1) //y axis
+                {
+                    axisY =  (-1) * round(evt.jaxis.value/maxAxis*1000)/1000;
+                }
+                axisRatio = sqrt(pow(axisX,2) + pow(axisY, 2));
+                if (axisX != 0 || axisY != 0)
+                {
+                    axisAngle = acos(axisX / axisRatio)*(180/M_PI);
+                    if (axisY > 0)
+                    {
+                        axisAngle += 2*(180-axisAngle);
+                    }
+                }
+                //-----------------------------
+            }
+            //-----------------------------------------------------
         }
         //--------------update-------------
         //----update de ship-------------
@@ -203,7 +224,7 @@ int main(int argc, char* argv[])
                 ship.go();
                 ship.velocity();
             }
-            ship.tourne();
+            ship.tourne(axisAngle);
             ship.collide();
             ship.battery();
         } else {
@@ -483,6 +504,7 @@ int main(int argc, char* argv[])
     SDL_DestroyRenderer(render);
     SDL_FreeSurface(image);
     SDL_DestroyWindow(window);
+    SDL_JoystickClose(pJoystick);
     IMG_Quit();
     SDL_Quit();
     return 0;

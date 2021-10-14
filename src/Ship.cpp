@@ -19,7 +19,7 @@ Ship::Ship(SDL_Renderer* render):
 //---------declaration usuelle-----------------
 x{500}, y{250}, size{64},
 jetPower{0.1f}, velocityX{0}, velocityY{0}, speedMax{5.0f},
-angle{90}, rotationSpeed{5}, fireOn{false}, rotationDirection{NULL},
+angle{90}, rotationSpeed{7}, fireOn{false}, rotationDirection{NULL},
 HP{5}, isVisible{true}, isDamaged{false}, isBlow{false}, isStunt{false}, damagedTime{120}, damagedTimer{0},
 blinkTime{10}, blinkTimer{0}, blowTime{150}, blowTimer{0}, sparkTime{60}, sparkTimer{0},
 maxEnergie{30}, canRecharge{true}, chargeTime{5}, chargeTimer{0},
@@ -108,20 +108,22 @@ void Ship::velocity()
 }
 
 //------rotation fuction----------
-void Ship::tourne()
-{
-    if (rotationDirection == '-')
-    {
-        angle += rotationSpeed;
-        if (angle >= 360) {
-            angle -= 360;
+void Ship::tourne(double newAngle) {
+    double diff = abs(angle - newAngle);
+    if (diff >= rotationSpeed) {
+        if ((angle < newAngle && diff < 180) || (angle > newAngle && diff > 180)) {
+            angle += rotationSpeed;
+            if (angle >= 360) {
+                angle -= 360;
+            }
+        } else {
+            angle -= rotationSpeed;
+            if (angle < 0) {
+                angle += 360;
+            }
         }
-    } else if (rotationDirection == '+')
-    {
-        angle -= rotationSpeed;
-        if (angle < 0) {
-            angle += 360;
-        }
+    } else {
+        angle = newAngle;
     }
 }
 
