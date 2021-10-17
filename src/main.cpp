@@ -149,8 +149,63 @@ int main(int argc, char* argv[])
                     scaleY = rect.h*1./screenHeight;
                 }
             }
-            //-----------------------------------------
-            if ( evt.type == SDL_JOYBUTTONDOWN || evt.type == SDL_JOYBUTTONUP)
+            //-------------- key board event-----------------
+            if (evt.type == SDL_KEYDOWN)
+            {
+                if (evt.key.keysym.sym == SDLK_z)
+                {
+                    ship.fireOn = true;
+                }
+
+                if (evt.key.keysym.sym == SDLK_q)
+                {
+                    ship.rotationDirection = GAUCHE;
+                }
+                if (evt.key.keysym.sym == SDLK_d)
+                {
+                    ship.rotationDirection = DROITE;
+                }
+
+                if (evt.key.keysym.sym == SDLK_l)
+                {
+                    if (readyLaser)
+                    {
+                        createLaser = true;
+                        readyLaser = false;
+                    }
+                }
+            }
+
+            if (evt.type == SDL_KEYUP)
+            {
+                if (evt.key.keysym.sym == SDLK_z)
+                {
+                    ship.fireOn = false;
+                }
+
+                if (evt.key.keysym.sym == SDLK_q)
+                {
+                    if (ship.rotationDirection == GAUCHE)
+                    {
+                        ship.rotationDirection = RIEN;
+                    }
+                }
+                if (evt.key.keysym.sym == SDLK_d)
+                {
+                    if (ship.rotationDirection == DROITE)
+                    {
+                        ship.rotationDirection = RIEN;
+                    }
+                }
+
+                if (evt.key.keysym.sym == SDLK_l)
+                {
+                    createLaser = false;
+                    readyLaser = true;
+                }
+            }
+            //-------------------- joystivk event---------------------
+            if (evt.type == SDL_JOYBUTTONDOWN || evt.type == SDL_JOYBUTTONUP)
             {
                 //------------------pressed------------------
                 if (evt.jbutton.state == SDL_PRESSED)
@@ -162,7 +217,6 @@ int main(int argc, char* argv[])
                         {
                             createLaser = true;
                             readyLaser = false;
-                            ship.canRecharge = false;
                         }
                     }
                 }
@@ -174,7 +228,6 @@ int main(int argc, char* argv[])
                     {
                         createLaser = false;
                         readyLaser = true;
-                        ship.canRecharge = true;
                     }
                 }
             }
@@ -224,7 +277,8 @@ int main(int argc, char* argv[])
                 ship.go();
                 ship.velocity();
             }
-            ship.tourne(axisAngle);
+            //ship.tourne(axisAngle);
+            ship.tourne();
             ship.collide();
             ship.battery();
         } else {
@@ -243,6 +297,7 @@ int main(int argc, char* argv[])
         //----------------------------lasers-------------------
         if (createLaser)
         {
+            ship.canRecharge = false;
             if (laserTimer >= laserRelease && ship.energie > 0)
             {
                 laserTimer = 0;
@@ -258,6 +313,10 @@ int main(int argc, char* argv[])
         } else
         {
             laserTimer = laserRelease; //reinitialise le timer
+            if (!ship.isDamaged)
+            {
+                ship.canRecharge = true;
+            }
         }
 
         for(Laser& laser:lasers)

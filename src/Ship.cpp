@@ -6,10 +6,7 @@
 # include <cmath>
 
 # include <thread>
-
 # include <filesystem>
-
-
 namespace fs = std::filesystem;
 
 extern int screenWidth;
@@ -127,6 +124,23 @@ void Ship::tourne(double newAngle) {
     }
 }
 
+void Ship::tourne()
+{
+    if (rotationDirection == GAUCHE)
+    {
+        angle -= rotationSpeed;
+        if (angle < 0) {
+            angle += 360;
+        }
+    } else if (rotationDirection == DROITE)
+    {
+        angle += rotationSpeed;
+        if (angle >= 360) {
+            angle -= 360;
+        }
+    }
+}
+
 //---------------colision-----------
 void Ship::collide()
 {
@@ -169,7 +183,8 @@ void Ship::damaged() {
         if (sparkTimer == 1) {
             std::thread th1(&Ship::playGif, this,sparkGif, 4);
             th1.detach();
-        } else if (sparkTimer > sparkTime) {
+        } else if (sparkTimer == sparkTime) {
+            printf("bug");
             canRecharge = true;
         }
         if (blinkTimer > blinkTime) {

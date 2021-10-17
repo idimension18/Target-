@@ -11,6 +11,10 @@
 # include "Sprite.h"
 
 
+enum sens {
+    RIEN, DROITE, GAUCHE
+};
+
 class Ship : public Sprite{
 public:
     Ship(SDL_Renderer* render);
@@ -19,11 +23,12 @@ public:
     int size, angle, HP, energie, maxEnergie, chargeTime, chargeTimer;
     double x, y, velocityX, velocityY;
     bool fireOn, canRecharge, isVisible, isDamaged, isBlow, isStunt;
-    char rotationDirection;
+    int rotationDirection;
 
     void go(); //calcule velocity
     void velocity(); // ad velocity
-    void tourne(double newAngle); //tourne
+    void tourne(double newAngle); //tourne (manette)
+    void tourne(); //legacy
     void collide(); //make collide
     void damaged(); //damaged
     bool blowUp(); //return true when end
