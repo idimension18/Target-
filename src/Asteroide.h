@@ -2,8 +2,8 @@
 // Created by MPA on 28/09/2021.
 //
 
-#include "SDL.h"
-#include "Sprite.h"
+# include "SDL.h"
+# include "Sprite.h"
 # include "SDL_image.h"
 
 #ifndef TARGET___ASTEROIDE_H

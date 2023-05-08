@@ -4,7 +4,7 @@
 
 #ifndef TARGET___LASER_H
 #define TARGET___LASER_H
-# include "SDL.h"
+# include <SDL2/SDL.h>
 # include "Sprite.h"
 # include "SDL_image.h"
 
