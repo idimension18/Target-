@@ -339,7 +339,7 @@ int main(int argc, char* argv[])
             if (rand()%10 < 8)
             {
                 //creation de cailloux
-                int newSize = rand()%100 +40;
+                int newSize = (rand()%100) +40;
                 cailloux.emplace_back(Asteroide(render,
                                                 rand() % (500 - newSize),
                                                 newSize,
