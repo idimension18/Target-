@@ -11,10 +11,10 @@ FILE = $(SRCS:$(SOURCE_DIR)/%=%)
 HEADERS = $(shell find $(SOURCE_DIR) -name '*.h')
 OBJS = $(FILE:.cpp=.o)
 
-all : dir target++
+all : dir $(EXEC)
 
 dir :
-	mkdir build
+	mkdir $(BUILD_DIR)
 
 $(EXEC) : $(OBJS)
 	$(CC) -o $(BUILD_DIR)/$@ $(addprefix $(BUILD_DIR)/,$(OBJS)) $(LDFLAGS)
